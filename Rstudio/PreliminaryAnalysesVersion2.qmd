@@ -1,0 +1,80 @@
+---
+title: "Visuals, Preliminary Analysis, Version 2"
+author: Mia Nahom
+date: 2025-03-17
+format: 
+  html:
+      df-print: paged
+      embed-resources: true
+editor: visual
+---
+### Packages
+```{r}
+#| output: false
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(tidyverse)
+library(SeqArray)
+library(dplyr)
+library(SNPRelate)
+library(ggrepel)
+```
+
+### Locations
+```{r}
+locations <- data.frame(
+   name = c("Nass", "Skeena", "Kemano", "Fraser", "Elwha", "Lyre", "Grays", "Cowlitz", "Sandy", "Klamath"),
+   lat = c(55.911678, 55.753281, 53.486133, 51.427018, 48.131627, 48.130871,46.350607, 46.257902,  45.385146, 41.779914),
+   lon = c(-129.038237, -127.956117, -128.121730, -122.212123, -123.551996,-123.827506, -123.609800, -122.897527, -122.060162, -123.037020)
+    )
+
+```
+
+
+
+```{r}
+# Load world map data
+PNW <- ne_countries(scale = "medium", country=c("United States of America","Canada"),returnclass = "sf")
+target_crs <-"+proj=moll"
+PNW_moll <- PNW %>% st_transform(crs=target_crs)
+# Convert locations data to spatial object
+locations_sf <- st_as_sf(locations, coords = c("lon", "lat"), crs = "EPSG:4326")
+locations_sf$name <- factor(locations_sf$name, levels = c("Nass", "Skeena", "Kemano", "Fraser", "Elwha", "Lyre", "Grays", "Cowlitz", "Sandy", "Klamath"))
+#mapwindow <- st_sfc(
+#  st_point(c(-146.56,38.51)),
+#  st_point(c(-103.75,65.41)),
+#  crs=4236
+#)
+
+mapwindow <- st_sfc(
+  st_point(c(-138.87,40.45)),
+  st_point(c(-116.56,60.80)),
+  crs=4236
+)
+
+window_coord_sf <- mapwindow %>% st_coordinates()
+window_coord_sf_moll <- mapwindow %>% st_transform(crs=target_crs) %>% st_coordinates()
+
+
+PNW_states <- ne_states(country=c("United States of America","Canada"),returnclass = "sf")
+states <- c("British Columbia", "Washington", "Oregon", "California","Alaska")
+PNW_states_2 <- subset(PNW_states, name %in% states)
+# Create the map
+ggplot() +
+  geom_sf(data = PNW_states, aes(fill = PNW_states$name, labels=FALSE), color = "black") +  # Add base map
+  geom_sf(data = locations_sf, aes(color = name), size = 3) + # Add locations
+  coord_sf(xlim=window_coord_sf[,"X"],ylim=window_coord_sf[,"Y"], expand=FALSE) +
+  theme_bw() + 
+  theme(panel.background=element_rect(fill="aliceblue")) +
+  labs(title = "River Locations")
+ggplot() +
+  geom_sf(data = PNW_states, fill = "lightgray", color = "black") +  # Add base map
+  geom_sf(data = locations_sf, aes(color=name), size = 3) + # Add locations
+  coord_sf(xlim=window_coord_sf[,"X"],ylim=window_coord_sf[,"Y"], expand=FALSE) +
+  theme_bw() + 
+  theme(panel.background=element_rect(fill="aliceblue")) +
+  labs(title = "River Locations")
+
+```
+
