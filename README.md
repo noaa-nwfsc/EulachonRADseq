@@ -1,7 +1,7 @@
 # EulachonRADseq
 Multi-year Eulachon RAD-seq analysis
 
-Current status: files have been de-multiplexed, aligned to genome, processed through stacks and output VCF file. VCFvisuals.html is preliminary look at coverage for individuals and sites and a rough filtered VCF (filtered individuals with missingness > 0.5, individuals that are duplicated between old and new, and site missingness <0.5, and variants with MAF <0.05 )
+Current status: files have been de-multiplexed, aligned to genome, processed through stacks and output VCF file. VCFvisuals.html is preliminary look at coverage for individuals and sites and a PCA for a roughly filtered VCF (filtered individuals with missingness > 0.5, individuals that are duplicated between old and new, and site missingness <0.5, and variants with MAF <0.05 )
 
 Next Steps:
 -  Explore batch effects where possible
