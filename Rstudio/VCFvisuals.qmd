@@ -17,6 +17,8 @@ library(SeqArray)
 library(dplyr)
 library(SNPRelate)
 library(ggrepel)
+library(wesanderson)
+library(RColorBrewer)
 ```
 
 ## Preliminary Analysis
@@ -112,6 +114,9 @@ colnames(meta)[3] <-"location_kit"
 meta[c('location', 'kit')] <- str_split_fixed(meta$location_kit, '_', 2)
 meta <- meta %>% mutate_all(na_if,"")
 meta
+barcodes <- read.csv("Barcodes.csv")
+barcodes_unique <- barcodes[!duplicated(barcodes$Individual), ]
+meta_bar <- merge(meta,barcodes_unique,by.x="INDV",by.y="Individual",all.x=TRUE)
 ```
 
 ## Filtering analysis - following this tutorial:
@@ -188,8 +193,13 @@ barplot(100*eig/sum(eig), main="PCA Eigenvalues")
 ```
 
 ```{r}
-meta_keep <- meta[meta$INDV %in% keep,]
-all(keep==meta_keep$INDV)
+#meta_keep <- meta[meta$INDV %in% keep,]
+#meta_keep <- meta_keep[order(match(meta_keep$INDV, keep)), ]
+#all(keep==meta_keep$INDV)
+
+meta_barkeep <- meta_bar[meta_bar$INDV %in% keep,]
+meta_barkeep <- meta_barkeep[order(match(meta_barkeep$INDV, keep)), ]
+all(keep==meta_barkeep$INDV)
 ```
 ```{r}
 # make a data.frame
@@ -204,9 +214,26 @@ plot(tab$EV2, tab$EV1, xlab="eigenvector 2", ylab="eigenvector 1")
 ```
 
 ```{r}
+#pal <- wes_palette("AsteroidCity2", 6, type = "discrete")
+pal <- c('#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#e7298a')
 print(
   as.data.frame(pca.out$eigenvect) %>%
-      tibble::add_column(., Loc =  meta_keep$location) %>%
+      tibble::add_column(., Plate =  meta_barkeep$Plate) %>%
+      ggplot(., aes(x=V1, y=V2, color = Plate)) + 
+      geom_point(size=2) +
+      stat_ellipse(level = 0.95, size = 1) +
+      geom_hline(yintercept = 0) +
+      geom_vline(xintercept = 0) +
+      theme_bw() +
+      xlab(paste0("PC1 [",paste0(round(eig[1], 2)), "%]")) +
+      ylab(paste0("PC2 [",paste0(round(eig[2], 2)), "%]")) +
+      ggtitle("PCA Colored by Plate (excluding old NEB)") +
+      scale_color_manual(values=pal)
+)
+pal <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+print(
+  as.data.frame(pca.out$eigenvect) %>%
+      tibble::add_column(., Loc =  meta_barkeep$location) %>%
       ggplot(., aes(x=V1, y=V2, color = Loc)) + 
       geom_point(size=2) +
       stat_ellipse(level = 0.95, size = 1) +
@@ -215,13 +242,15 @@ print(
       theme_bw() +
       xlab(paste0("PC1 [",paste0(round(eig[1], 2)), "%]")) +
       ylab(paste0("PC2 [",paste0(round(eig[2], 2)), "%]")) +
-      ggtitle("PCA Colored by Collection Location")
+      ggtitle("PCA Colored by Location") +
+      scale_color_manual(values=pal)
 )
 ```
 
+
 ```{r}
 as.data.frame(pca.out$eigenvect) %>%
-      tibble::add_column(., ID =  meta_keep$INDV) %>%
+      tibble::add_column(., ID =  meta_barkeep$INDV) %>%
       select(ID, everything()) 
 ```
 

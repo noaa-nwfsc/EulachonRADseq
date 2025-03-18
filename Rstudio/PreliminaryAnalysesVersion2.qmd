@@ -32,7 +32,7 @@ locations <- data.frame(
 ```
 
 
-
+### Map
 ```{r}
 # Load world map data
 PNW <- ne_countries(scale = "medium", country=c("United States of America","Canada"),returnclass = "sf")
@@ -61,20 +61,23 @@ PNW_states <- ne_states(country=c("United States of America","Canada"),returncla
 states <- c("British Columbia", "Washington", "Oregon", "California","Alaska")
 PNW_states_2 <- subset(PNW_states, name %in% states)
 # Create the map
-ggplot() +
-  geom_sf(data = PNW_states, aes(fill = PNW_states$name, labels=FALSE), color = "black") +  # Add base map
-  geom_sf(data = locations_sf, aes(color = name), size = 3) + # Add locations
-  coord_sf(xlim=window_coord_sf[,"X"],ylim=window_coord_sf[,"Y"], expand=FALSE) +
-  theme_bw() + 
-  theme(panel.background=element_rect(fill="aliceblue")) +
-  labs(title = "River Locations")
+#ggplot() +
+#  geom_sf(data = PNW_states, aes(fill = PNW_states$name, labels=FALSE), color = "black") #+  # Add base map
+#  geom_sf(data = locations_sf, aes(color = name), size = 3) + # Add locations
+#  coord_sf(xlim=window_coord_sf[,"X"],ylim=window_coord_sf[,"Y"], expand=FALSE) +
+#  theme_bw() + 
+#  theme(panel.background=element_rect(fill="aliceblue")) +
+#  labs(title = "River Locations")
+pal<- c('#9e0142','#1f78b4','#762a83','#fb9a99','#f46d43','#33a02c','#e31a1c','#ff7f00','#1b7837','#6a3d9a')
+
 ggplot() +
   geom_sf(data = PNW_states, fill = "lightgray", color = "black") +  # Add base map
   geom_sf(data = locations_sf, aes(color=name), size = 3) + # Add locations
   coord_sf(xlim=window_coord_sf[,"X"],ylim=window_coord_sf[,"Y"], expand=FALSE) +
   theme_bw() + 
   theme(panel.background=element_rect(fill="aliceblue")) +
-  labs(title = "River Locations")
+  labs(title = "River Locations") +
+  scale_color_manual(values=pal)
 
 ```
 
