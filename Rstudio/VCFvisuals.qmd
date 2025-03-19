@@ -161,7 +161,7 @@ First filter our samples with a missingness >0.5 and then filter out the individ
 sample.ids = seqGetData(gdsin, "sample.id")
 bad_samples = sampleframe[sampleframe$m2 > 0.5, "samples"]
 keep = sample.ids[which(!sample.ids %in% bad_samples)]
-keep <- keep[!grepl("old", keep)]
+#keep <- keep[!grepl("old", keep)]
 ```
 ## LD pruning 
 ```{r}
@@ -215,7 +215,7 @@ plot(tab$EV2, tab$EV1, xlab="eigenvector 2", ylab="eigenvector 1")
 
 ```{r}
 #pal <- wes_palette("AsteroidCity2", 6, type = "discrete")
-pal <- c('#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#e7298a')
+pal <- c('#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#e7298a','#fdbf6f')
 print(
   as.data.frame(pca.out$eigenvect) %>%
       tibble::add_column(., Plate =  meta_barkeep$Plate) %>%
